@@ -1,0 +1,9 @@
+@echo off
+TITLE Uruchamianie Aplikacji Wypozyczalni
+echo Uruchamianie serwera backend...
+start "Backend Server" cmd /k "cd backend && npm start"
+echo Uruchamianie serwera frontend...
+start "Frontend Server" cmd /k "cd frontend && npm run dev"
+echo Otwieram aplikacje w przegladarce...
+start http://localhost:5173
+exit

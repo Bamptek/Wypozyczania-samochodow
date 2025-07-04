@@ -1,0 +1,76 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(cuid())
+  email     String    @unique
+  username  String    @unique
+  password  String
+  role      Role      @default(USER)
+  points    Int       @default(0)
+
+  emailVerified               Boolean?  @default(false)
+  emailVerificationToken      String?   @unique
+  emailVerificationTokenExpires DateTime?
+
+  bookings  Booking[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+model Car {
+  id              String       @id @default(cuid())
+  make            String
+  model           String
+  year            Int
+  licensePlate    String       @unique
+  pricePerDay     Float
+  status          CarStatus    @default(AVAILABLE)
+  imageUrl        String?
+  bookings        Booking[]
+  serviceHistory  ServiceLog[]
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+}
+
+model Booking {
+  id         String   @id @default(cuid())
+  userId     String
+  carId      String
+  startDate  DateTime
+  endDate    DateTime
+  totalPrice Float
+  status     String   @default("CONFIRMED") 
+  pointsUsed         Int      @default(0)
+  cancellation_token String?  @unique 
+  user       User     @relation(fields: [userId], references: [id])
+  car        Car      @relation(fields: [carId], references: [id])
+  createdAt  DateTime @default(now())
+}
+
+model ServiceLog {
+  id          String   @id @default(cuid())
+  carId       String
+  date        DateTime
+  description String
+  cost        Float
+  car         Car      @relation(fields: [carId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum CarStatus {
+  AVAILABLE
+  RENTED
+  UNAVAILABLE
+}
